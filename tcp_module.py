@@ -1,4 +1,5 @@
-# SERVER TCP
+# TCP MODULE
+# Collects informations from remote sensors.
 
 import socket
 import libellium_parser, mqttx_publisher
