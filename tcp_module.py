@@ -6,10 +6,6 @@ import libellium, mqttx
 import config
 
 
-BROKER = "broker.emqx.io"
-TOPIC  = "DTLab/measurements"
-
-
 class TcpModule():
 
 
@@ -98,7 +94,7 @@ class TcpModule():
 
         try:
             # Starts a MQTTX client
-            publisher = mqttx.Client(BROKER, TOPIC)
+            publisher = mqttx.Client(config.BROKER, config.TOPIC_MEASUREMENTS)
             publisher.start()
 
             ################# Qui il dict va trasformato in JSON
