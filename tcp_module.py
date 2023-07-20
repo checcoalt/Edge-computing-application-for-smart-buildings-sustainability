@@ -3,6 +3,7 @@
 
 import socket, threading
 import libellium, mqttx
+import config
 
 
 BROKER = "broker.emqx.io"
