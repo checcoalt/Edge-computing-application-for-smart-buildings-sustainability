@@ -1,7 +1,8 @@
 # TCP MODULE
 # Collects informations from remote sensors.
 
-import socket, threading
+from datetime import datetime
+import socket, threading, json
 import libellium, mqttx
 import config
 
@@ -62,7 +63,7 @@ class TcpModule():
             print("[TCP MODULE] TCP connection error: " + str(e))
 
 
-    def decode(self) -> str:   # str deve diventare dict
+    def decode(self) -> dict:
 
         """
             Decodes frame into strcutured data.
@@ -71,19 +72,21 @@ class TcpModule():
             Returns a dictionary with collected informations: <measure_type, measure_value>.
         """
 
-        try:
-            measurement = libellium.Libellium(self.buffer)
-            measurement.parse()
-            print(measurement)
+        # Call to 'libellium' module utilities
+        measurement = libellium.Libellium(self.buffer)
+        measurement.parse()
+        print(measurement)
 
-            # Measurement -> dict
+        # Create a dictionary of measures
+        measurements = {}
+        for measure in measurement.measurements:
+            measurements[measure[0].ascii_id] = f"{measure[1]} {measure[0].unit}" 
 
-            return str(measurement)
-        except:
-            pass
+        return measurements
+        
 
 
-    def to_mqtt_broker(self, measures : str) -> None:       # str deve diventare dict
+    def to_mqtt_broker(self, measures : dict) -> None:
 
         """
             Publishes on the broker for the selected topic.
@@ -97,10 +100,26 @@ class TcpModule():
             publisher = mqttx.Client(config.BROKER, config.TOPIC_MEASUREMENTS)
             publisher.start()
 
-            ################# Qui il dict va trasformato in JSON
+            # dict to JSON
+            json_string = {
+                "metadata": {
+                    "date": datetime.today().strftime('%Y-%m-%d'),
+                    "time": datetime.now().strftime('%H:%M:%S.%f')[:-5],
+                    "descriptor": config.DESCRIPTOR,
+                    "sensor name": config.SENSOR_NAME,
+                    "sensor model": config.SENSOR_MODEL,
+                    "room": config.ROOM,
+                    "protocol": config.PROTOCOL,
+                    "broker": config.BROKER,
+                    "topic": config.TOPIC_MEASUREMENTS
+                },
+                "data": measures
+            }
+
+            json_string = json.dumps(json_string)
 
             # Publish on the given topic
-            publisher.publish(measures)
+            publisher.publish(json_string)
 
             # Kills the client
             publisher.stop()
