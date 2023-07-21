@@ -296,9 +296,13 @@ class Libellium():
 
                 measure = ''
 
-                for token in tokens[index:index+sensor.size_per_field[0]]:
-                    measure += token
-                    index += 1
+                try:
+                    for token in tokens[index:index+sensor.size_per_field[0]]:
+                        measure += token
+                        index += 1
+                except IndexError:
+                    pass
+                    # come si fa a capire la terminazione di una stringa?
 
                 measure = int(measure, 2)
 
