@@ -109,6 +109,8 @@ class TcpModule():
             print("[MQTTX MODULE]: connection error.")
         except mqttx.MqttSubscriptionError:
             print("[MQTTX MODULE]: subscription error.")
+        except mqttx.MqttTopicNotSpecified:
+            print("[MQTTX MODULE]: topic not specified.")
         except mqttx.MqttPublishError:
             print("[MQTTX MODULE]: publish error.")
 
