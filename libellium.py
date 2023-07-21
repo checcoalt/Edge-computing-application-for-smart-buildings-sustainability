@@ -7,9 +7,6 @@ class FrameType ():
 
     def __str__(self) -> str:
         return f"<Type: {self.encoding} - {self.type}>"
-    
-class FrameTypeNotExists(Exception):
-    pass
 
 FRAME_TYPES = {
     0x00: FrameType('Binary', 'Information'),
@@ -39,6 +36,14 @@ FRAME_TYPES = {
     0x9B: FrameType('ASCII', 'Tyme Sync')
 }
 
+class FrameTypeNotExists(Exception):
+    def __init__(self, frame_type_id):
+        self.frame_type_id = frame_type_id
+
+    def __str__(self):
+        return f"Frame type with ID {self.frame_type_id} does not exist in the FRAME_TYPES dictionary."
+
+
 class Sensor():
     
     def __init__(self,
@@ -54,40 +59,36 @@ class Sensor():
                  unit : str = ''
                  ) -> None:
         
-        self.name = name,
-        self.reference = reference,
-        self.tag = tag,
-        self.binary_id = binary_id,
-        self.ascii_id = ascii_id,
-        self.number_of_fields = number_of_fields,
-        self.fields_type = fields_type,
-        self.size_per_field = size_per_field,
-        self.default_decimal_precision = default_decimal_precision,
+        self.name = name
+        self.reference = reference
+        self.tag = tag
+        self.binary_id = binary_id
+        self.ascii_id = ascii_id
+        self.number_of_fields = number_of_fields
+        self.fields_type = fields_type
+        self.size_per_field = size_per_field
+        self.default_decimal_precision = default_decimal_precision
         self.unit = unit
 
+    def string_measure(self, measure) -> str:
+        
+        return f"{self.name} [{self.tag}]: {measure} {self.unit}"
+
+class SensorIdNotExists(Exception):
+    def __init__(self, sensor_id):
+        self.sensor_id = sensor_id
+
     def __str__(self):
-        return f"Sensor(name='{self.name}', reference='{self.reference}', tag='{self.tag}', " \
-               f"binary_id={self.binary_id}, ascii_id='{self.ascii_id}', " \
-               f"number_of_fields={self.number_of_fields}, fields_type='{self.fields_type}', " \
-               f"size_per_field={self.size_per_field}, " \
-               f"default_decimal_precision={self.default_decimal_precision}, unit='{self.unit}')"
+        return f"Sensor with ID {self.sensor_id} does not exist in the SENSORS dictionary."
+    
+class UnexpectedTokenException(Exception):
+    def __init__(self, position, token, expected_token):
+        self.position = position
+        self.token = token
+        self.expected_token = expected_token
 
-########## DIVIDERE I SENSORI PER CATEGORIE
-
-SENSORS_GASES = {}
-SENSORS_GASES_PRO = {}
-SENSORS_EVENTS = {}
-SENSORS_CITIES_PRO = {}
-SENSORS_IONS = {}
-SENSORS_RADIATION = {}
-SENSORS_WATER = {}
-SENSORS_AGR = {}
-SENSORS_AMBIENT = {}
-SENSORS_ADD = {}
-SENSORS_CURRENT = {}
-SENSORS_INDUSTRIAL = {}
-SENSORS_AGRX = {}
-SENSORS_WTRX = {}
+    def __str__(self):
+        return f"Unexpected token in position {self.position}: '{self.token}', expected '{self.expected_token}'"
 
 
 
@@ -147,25 +148,17 @@ SENSORS = {
     70: Sensor('Particle Matter - PM1', '9387-P', 'SENSOR_GASES_PRO_PM1', 70, 'PM1', 1, 'float', 4, 4, 'μg/m3'),
     71: Sensor('Particle Matter - PM2.5', '9387-P', 'SENSOR_GASES_PRO_PM2_5', 71, 'PM2_5', 1, 'float', 4, 4, 'μg/m3'),
     72: Sensor('Particle Matter - PM10', '9387-P', 'SENSOR_GASES_PRO_PM10', 72, 'PM10', 1, 'float', 4, 4, 'μg/m3'),
-    74: Sensor('BME - Temperature Celsius', '9370-P', 'SENSOR_GASES_TC', 74, 'TC', 1, 'float', 4, 2, 'º C'),
-    75: Sensor('BME - Temperature Farhenheit', '9370-P', 'SENSOR_GASES_TF', 75, 'TF', 1, 'float', 4, 2, 'º F'),
+    74: Sensor('BME - Temperature Celsius', '9370-P', 'SENSOR_GASES_TC', 74, 'TC', 1, 'float', 4, 2, 'ºC'),
+    75: Sensor('BME - Temperature Farhenheit', '9370-P', 'SENSOR_GASES_TF', 75, 'TF', 1, 'float', 4, 2, 'ºF'),
     76: Sensor('BME - Humidity', '9370-P', 'SENSOR_GASES_HUM', 76, 'HUM', 1, 'float', 4, 1, '%RH'),
     77: Sensor('BME - Pressure', '9370-P', 'SENSOR_GASES_PRES', 77, 'PRES', 1, 'float', 4, 2, 'Pascales'),
     78: Sensor('Luxes', '9325', 'SENSOR_GASES_LUXES', 78, 'LUX', 1, 'uint32_t', 4, 0, 'luxes'),
     79: Sensor('Ultrasound', '9246-P', 'SENSOR_GASES_US', 79, 'US', 1, 'uint16_t', 2, 0, 'cm')
 }
 
-
-
-class Frame():
-    pass
-
-class FrameNotDefinedException(Exception):
-    pass
-
 class Libellium():
 
-    def __init__(self, frame : str = '') -> None:
+    def __init__(self, frame : str) -> None:
 
         """
         """
@@ -178,17 +171,27 @@ class Libellium():
         self.waspmote_id = ''
         self.frame_sequence = 0
 
-        # completare con self.co2_measure, ...
+        self.measurements = []
 
     # Overriding "to string" method to display informations in a proper way
     def __str__(self) -> str:
-        return f"----------------------------------------\nFrame:\
+        string = f"------------------------------------------------------------------------------------------------------------------------\
+        \nFrame:\
         \n\t{self.type}\
         \n\t<Number of bytes: {self.number_of_bytes}>\
         \n\t<Serial ID: {self.serial_id}>\
         \n\t<Waspmote ID: {self.waspmote_id}>\
         \n\t<Frame sequence: {self.frame_sequence}>\
-        \n----------------------------------------"
+        \n\n"
+
+        for measure in self.measurements:
+            s = measure[0]
+            m = measure[1]
+            string += f"\t<SENSOR>\t{s.string_measure(m)}\n"
+
+        string += "\n------------------------------------------------------------------------------------------------------------------------"
+        return string
+    
 
     def hex_to_binary(self, hex_string: str) -> str:
 
@@ -216,21 +219,13 @@ class Libellium():
         """
 
         tokens = []
-        chars = []
 
         for i in range(0, len(hex_string), 2):
 
             byte = self.hex_to_binary(hex_string[i:i+2])
             tokens.append('0' * (8 - len(byte)) + byte)
-            chars.append(self.binary_to_char(byte))
 
-        print(chars)
         return tokens
-
-    
-    def measure_to_string(sensor : int, measure):
-        
-        message = "\t\t[SENSOR]"
 
 
     def parse(self):
@@ -246,10 +241,13 @@ class Libellium():
                   chr(int(tokens[2], 2))
 
         if starter != "<=>":
-            raise Exception
+            raise UnexpectedTokenException("0-2", starter, "<=>")
 
         # read type (1 byte)
-        self.type = FRAME_TYPES[int(tokens[3], 2)]
+        try:
+            self.type = FRAME_TYPES[int(tokens[3], 2)]
+        except FrameTypeNotExists:
+            print("[LIBELLIUM] Frame type not found.")
 
         # read number of bytes (1 byte)
         self.number_of_bytes = int(tokens[4], 2)
@@ -267,18 +265,16 @@ class Libellium():
             if token == '00100011':         # '00100011' = 0x23 = 35 = '#'
                 break
             else:
-                print(token + " - " + str(int(token, 2)))
-                print(chr(int(token, 2)))
                 self.waspmote_id += chr(int(token, 2))
-                print(self.waspmote_id)
                 index += 1
 
         # separator must be '#'
         separator = chr(int(tokens[index], 2))
-        index += 1
 
         if separator != "#":    
-            raise Exception
+            raise UnexpectedTokenException(index-1, separator, "#")
+        
+        index += 1
 
         # read frame sequence (1 byte)
         self.frame_sequence = int(tokens[index], 2)
@@ -297,7 +293,7 @@ class Libellium():
                 measure = ''
 
                 try:
-                    for token in tokens[index:index+sensor.size_per_field[0]]:
+                    for token in tokens[index:index+sensor.size_per_field]:
                         measure += token
                         index += 1
                 except IndexError:
@@ -306,10 +302,10 @@ class Libellium():
 
                 measure = int(measure, 2)
 
-                print(sensor.name[0], sensor.tag[0], sensor.binary_id[0], str(measure), sensor.unit[0], "\n", end = " ")
+                self.measurements.append((sensor, measure))
 
-            except KeyError:
-                print("Sensor ID not valid.")
+            except SensorIdNotExists(sensor_id):
+                print("[LIBELLIUM] Sensor ID not valid.")
 
             try:
                 tokens[index]
