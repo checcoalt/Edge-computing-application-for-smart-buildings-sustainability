@@ -7,6 +7,9 @@ class FrameType ():
 
     def __str__(self) -> str:
         return f"<Type: {self.encoding} - {self.type}>"
+    
+class FrameTypeNotExists(Exception):
+    pass
 
 FRAME_TYPES = {
     0x00: FrameType('Binary', 'Information'),
@@ -70,6 +73,15 @@ class Sensor():
                f"default_decimal_precision={self.default_decimal_precision}, unit='{self.unit}')"
 
 ########## DIVIDERE I SENSORI PER CATEGORIE
+
+SENSORS_GASES = {}
+SENSORS_GASES_PRO = {}
+SENSORS_EVENTS = {}
+SENSORS_CITIES_PRO = {}
+SENSORS_IONS = {}
+SENSORS_RADIATION = {}
+SENSORS_WATER = {}
+
 
 SENSORS = {
     0: Sensor('Carbon Monoxide - CO', '9229', 'SENSOR_GASES_CO', 0, 'CO', 1, 'float', 4, 3, 'ppm'),
