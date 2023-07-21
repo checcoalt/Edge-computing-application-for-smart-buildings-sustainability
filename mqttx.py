@@ -170,4 +170,3 @@ if __name__ == '__main__':
     except MqttTopicNotSpecified:
         print("[MQTTX MODULE]: topic not specified.")
     except MqttPublishError:
-        print("[MQTTX MODULE]: publish error.")
