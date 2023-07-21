@@ -1,5 +1,4 @@
-# TCP MODULE
-# Collects informations from remote sensors.
+# ************************************** TCP MODULE **************************************
 
 from datetime import datetime
 import socket, threading, json
