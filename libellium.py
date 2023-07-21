@@ -1,15 +1,32 @@
 # ************************************** LIBELLIUM MODULE **************************************
 
-class FrameType ():
-    
-    def __init__(self, encoding: str, type : str) -> None:
+class FrameType:
+    """
+    Defines a simple structure to identify the frame's type.
+    """
+
+    def __init__(self, encoding: str, type: str):
+        """
+        Constructor for FrameType class.
+
+        Args:
+            encoding (str): Encoding type, e.g., 'Binary' or 'ASCII'.
+            type (str): Type of the frame, e.g., 'Information', 'TimeOut', 'Event', etc.
+        """
         self.encoding = encoding
         self.type = type
 
     def __str__(self) -> str:
+        """
+        Returns a string representation of the FrameType object.
+        """
         return f"<Type: {self.encoding} - {self.type}>"
 
+
 FRAME_TYPES = {
+    # Defines a dictionary mapping all possible types of frames and their encoding rules.
+    # The keys are hexadecimal frame type IDs, and the values are FrameType objects.
+    
     0x00: FrameType('Binary', 'Information'),
     0x01: FrameType('Binary', 'TimeOut'),
     0x02: FrameType('Binary', 'Event'),
@@ -35,31 +52,76 @@ FRAME_TYPES = {
     0x87: FrameType('ASCII', 'Information'),
     0x88: FrameType('ASCII', 'Information'),
     0x9B: FrameType('ASCII', 'Tyme Sync')
+
 }
 
+
 class FrameTypeNotExists(Exception):
+    """
+    Defines an exception for an invalid type, related to the FRAME_TYPES dictionary.
+    """
+
     def __init__(self, frame_type_id):
+        """
+        Constructor for FrameTypeNotExists exception.
+
+        Args:
+            frame_type_id: The ID of the frame type that does not exist in the FRAME_TYPES dictionary.
+        """
         self.frame_type_id = frame_type_id
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the FrameTypeNotExists exception.
+        """
         return f"Frame type with ID {self.frame_type_id} does not exist in the FRAME_TYPES dictionary."
 
 
-class Sensor():
-    
-    def __init__(self,
-                 name : str = '',
-                 reference : str = '',
-                 tag : str = '',
-                 binary_id : int = 0,
-                 ascii_id : str = '',
-                 number_of_fields : int = 0,
-                 fields_type : str = '',
-                 size_per_field : int = 0,
-                 default_decimal_precision : int = 0,
-                 unit : str = ''
-                 ) -> None:
-        
+class Sensor:
+    """
+    Represents a sensor with its properties.
+
+    Attributes:
+        name (str): Name of the sensor.
+        reference (str): Reference code of the sensor.
+        tag (str): Tag associated with the sensor.
+        binary_id (int): Binary identifier of the sensor.
+        ascii_id (str): ASCII identifier of the sensor.
+        number_of_fields (int): Number of fields in the sensor data.
+        fields_type (str): Type of the sensor's fields, e.g., 'float', 'int', 'string'.
+        size_per_field (int): Size per field in bytes.
+        default_decimal_precision (int): Default decimal precision for floating-point fields.
+        unit (str): Measurement unit of the sensor data.
+    """
+
+    def __init__(
+        self,
+        name: str = '',
+        reference: str = '',
+        tag: str = '',
+        binary_id: int = 0,
+        ascii_id: str = '',
+        number_of_fields: int = 0,
+        fields_type: str = '',
+        size_per_field: int = 0,
+        default_decimal_precision: int = 0,
+        unit: str = ''
+    ):
+        """
+        Constructor for Sensor class.
+
+        Args:
+            name (str, optional): Name of the sensor. Default is an empty string.
+            reference (str, optional): Reference code of the sensor. Default is an empty string.
+            tag (str, optional): Tag associated with the sensor. Default is an empty string.
+            binary_id (int, optional): Binary identifier of the sensor. Default is 0.
+            ascii_id (str, optional): ASCII identifier of the sensor. Default is an empty string.
+            number_of_fields (int, optional): Number of fields in the sensor data. Default is 0.
+            fields_type (str, optional): Type of the sensor's fields, e.g., 'float', 'int', 'string'. Default is an empty string.
+            size_per_field (int, optional): Size per field in bytes. Default is 0.
+            default_decimal_precision (int, optional): Default decimal precision for floating-point fields. Default is 0.
+            unit (str, optional): Measurement unit of the sensor data. Default is an empty string.
+        """
         self.name = name
         self.reference = reference
         self.tag = tag
@@ -72,25 +134,62 @@ class Sensor():
         self.unit = unit
 
     def string_measure(self, measure) -> str:
-        
+        """
+        Returns a formatted string representation of the sensor's measurement.
+
+        Args:
+            measure: Measurement value of the sensor.
+
+        Returns:
+            str: Formatted string representation of the sensor measurement.
+        """
         return f"{self.name} [{self.tag}]: {measure} {self.unit}"
 
+
 class SensorIdNotExists(Exception):
+    """
+    Defines an exception for an invalid sensor ID, related to the SENSORS dictionary.
+    """
+
     def __init__(self, sensor_id):
+        """
+        Constructor for SensorIdNotExists exception.
+
+        Args:
+            sensor_id: The ID of the sensor that does not exist in the SENSORS dictionary.
+        """
         self.sensor_id = sensor_id
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the SensorIdNotExists exception.
+        """
         return f"Sensor with ID {self.sensor_id} does not exist in the SENSORS dictionary."
-    
+
+
 class UnexpectedTokenException(Exception):
+    """
+    Defines an exception for unexpected tokens in parsing the Libellium frame.
+    """
+
     def __init__(self, position, token, expected_token):
+        """
+        Constructor for UnexpectedTokenException.
+
+        Args:
+            position (int): The position of the unexpected token.
+            token (str): The unexpected token.
+            expected_token (str): The token expected at the given position.
+        """
         self.position = position
         self.token = token
         self.expected_token = expected_token
 
     def __str__(self):
+        """
+        Returns a string representation of the UnexpectedTokenException.
+        """
         return f"Unexpected token in position {self.position}: '{self.token}', expected '{self.expected_token}'"
-
 
 
 SENSORS = {
@@ -157,154 +256,137 @@ SENSORS = {
     79: Sensor('Ultrasound', '9246-P', 'SENSOR_GASES_US', 79, 'US', 1, 'uint16_t', 2, 0, 'cm')
 }
 
-class Libellium():
 
-    def __init__(self, frame : str) -> None:
+class Libellium:
+    """
+    Represents a Libellium frame and provides methods for parsing it.
 
+    Attributes:
+        frame (str): The input Libellium frame in hexadecimal format.
+        type (FrameType): The type of the Libellium frame.
+        number_of_bytes (int): The number of bytes in the frame.
+        serial_id (str): The serial ID of the frame.
+        waspmote_id (str): The Waspmote ID associated with the frame.
+        frame_sequence (int): The frame sequence number.
+        measurements (list): A list of tuples containing (Sensor, measurement) pairs.
+    """
+
+    def __init__(self, frame: str):
         """
+        Constructor for Libellium class.
+
+        Args:
+            frame (str): The input Libellium frame in hexadecimal format.
         """
-        
         self.frame = frame
-
         self.type = -1
         self.number_of_bytes = 0
         self.serial_id = ''
         self.waspmote_id = ''
         self.frame_sequence = 0
-
         self.measurements = []
 
-    # Overriding "to string" method to display informations in a proper way
-    def __str__(self) -> str:
-        string = f"------------------------------------------------------------------------------------------------------------------------\
-        \nFrame:\
-        \n\t{self.type}\
-        \n\t<Number of bytes: {self.number_of_bytes}>\
-        \n\t<Serial ID: {self.serial_id}>\
-        \n\t<Waspmote ID: {self.waspmote_id}>\
-        \n\t<Frame sequence: {self.frame_sequence}>\
-        \n\n"
-
-        for measure in self.measurements:
-            s = measure[0]
-            m = measure[1]
-            string += f"\t<SENSOR>\t{s.string_measure(m)}\n"
-
-        string += "\n------------------------------------------------------------------------------------------------------------------------"
-        return string
-    
-
     def hex_to_binary(self, hex_string: str) -> str:
-
         """
-            Converts a hexadecimal string into a binary string.
-        """
+        Converts a hexadecimal string into a binary string.
 
+        Args:
+            hex_string (str): The hexadecimal string to be converted.
+
+        Returns:
+            str: The binary representation of the input hexadecimal string.
+        """
         integer_value = int(hex_string, 16)
-        binary_string = bin(integer_value)[2:]  # Rimuovi il prefisso "0b"
+        binary_string = bin(integer_value)[2:]  # Remove the prefix "0b"
         return binary_string
 
-    def binary_to_char(self, binary_string : str) -> str:
-
+    def binary_to_char(self, binary_string: str) -> str:
         """
-        """
+        Converts a binary string into a character.
 
+        Args:
+            binary_string (str): The binary string to be converted.
+
+        Returns:
+            str: The character representation of the input binary string.
+        """
         ascii_value = int(binary_string, 2)
         char = chr(ascii_value)
-
         return char
-    
+
     def tokenize(self, hex_string: str) -> list:
-
         """
-        """
+        Tokenizes a hexadecimal string into a list of binary strings.
 
+        Args:
+            hex_string (str): The hexadecimal string to be tokenized.
+
+        Returns:
+            list: A list of binary strings representing tokens from the input hexadecimal string.
+        """
         tokens = []
-
         for i in range(0, len(hex_string), 2):
-
-            byte = self.hex_to_binary(hex_string[i:i+2])
+            byte = self.hex_to_binary(hex_string[i:i + 2])
             tokens.append('0' * (8 - len(byte)) + byte)
-
         return tokens
 
-
     def parse(self):
-
         """
+        Parses the Libellium frame and populates the class attributes accordingly.
         """
-
         tokens = self.tokenize(self.frame)
 
-        # starter must be '<=>'
-        starter = chr(int(tokens[0], 2)) + \
-                  chr(int(tokens[1], 2)) + \
-                  chr(int(tokens[2], 2))
+        starter = chr(int(tokens[0], 2)) + chr(int(tokens[1], 2)) + chr(int(tokens[2], 2))
 
         if starter != "<=>":
             raise UnexpectedTokenException("0-2", starter, "<=>")
 
-        # read type (1 byte)
         try:
             self.type = FRAME_TYPES[int(tokens[3], 2)]
         except FrameTypeNotExists:
             print("[LIBELLIUM] Frame type not found.")
 
-        # read number of bytes (1 byte)
         self.number_of_bytes = int(tokens[4], 2)
 
-        # read serial id (8 bytes)
         for token in tokens[5:13]:
             self.serial_id += token
-
         self.serial_id = int(self.serial_id, 2)
 
-        # read Waspmote ID until '#' (variable from 0 to 16 bytes)
         self.waspmote_id = ''
         index = 13
         for token in tokens[13:]:
-            if token == '00100011':         # '00100011' = 0x23 = 35 = '#'
+            if token == '00100011':  # '00100011' = 0x23 = 35 = '#'
                 break
             else:
                 self.waspmote_id += chr(int(token, 2))
                 index += 1
 
-        # separator must be '#'
         separator = chr(int(tokens[index], 2))
 
-        if separator != "#":    
-            raise UnexpectedTokenException(index-1, separator, "#")
-        
-        index += 1
+        if separator != "#":
+            raise UnexpectedTokenException(index - 1, separator, "#")
 
-        # read frame sequence (1 byte)
+        index += 1
         self.frame_sequence = int(tokens[index], 2)
         index += 1
 
-        ## PAYLOAD
-
         end_of_frame = False
         while not end_of_frame:
-
             try:
                 sensor_id = int(tokens[index], 2)
                 index += 1
                 sensor = SENSORS[sensor_id]
-
                 measure = ''
 
                 try:
-                    for token in tokens[index:index+sensor.size_per_field]:
+                    for token in tokens[index:index + sensor.size_per_field]:
                         measure += token
                         index += 1
                 except IndexError:
                     pass
-                    # come si fa a capire la terminazione di una stringa?
 
                 measure = int(measure, 2)
-
                 self.measurements.append((sensor, measure))
-
             except SensorIdNotExists(sensor_id):
                 print("[LIBELLIUM] Sensor ID not valid.")
 
@@ -312,12 +394,9 @@ class Libellium():
                 tokens[index]
             except:
                 end_of_frame = True
-            
-
 
 
 if __name__ == '__main__':
-
     frame = "3C3D3E06451B20B4BD3C195E206E6F64655F3031231434641500000000006185EB3F0100000000046179913E4A7B14C4414C005462424DBFD0C647460000000047000000004800000000"
 
     measure = Libellium(frame)

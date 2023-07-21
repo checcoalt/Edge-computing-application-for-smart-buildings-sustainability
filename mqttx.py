@@ -20,45 +20,92 @@ RETURN_CODES = {
 
 
 
-"""
-    Exception classes for MQTT protocol
-"""
-
 class MqttConnectionError(Exception):
+    """
+    Exception class for MQTT connection errors.
+    """
+
     def __init__(self, message="MQTT connection error"):
+        """
+        Constructor for MqttConnectionError exception.
+
+        Args:
+            message (str, optional): Custom error message. Defaults to "MQTT connection error".
+        """
         self.message = message
         super().__init__(self.message)
+
 
 class MqttSubscriptionError(Exception):
+    """
+    Exception class for MQTT subscription errors.
+    """
+
     def __init__(self, message="MQTT subscription error"):
+        """
+        Constructor for MqttSubscriptionError exception.
+
+        Args:
+            message (str, optional): Custom error message. Defaults to "MQTT subscription error".
+        """
         self.message = message
         super().__init__(self.message)
+
 
 class MqttPublishError(Exception):
+    """
+    Exception class for MQTT message publish errors.
+    """
+
     def __init__(self, message="MQTT message publish error"):
+        """
+        Constructor for MqttPublishError exception.
+
+        Args:
+            message (str, optional): Custom error message. Defaults to "MQTT message publish error".
+        """
         self.message = message
         super().__init__(self.message)
+
 
 class MqttTopicNotSpecified(Exception):
+    """
+    Exception class for MQTT topic not specified errors.
+    """
+
     def __init__(self, message="MQTT topic not specified"):
+        """
+        Constructor for MqttTopicNotSpecified exception.
+
+        Args:
+            message (str, optional): Custom error message. Defaults to "MQTT topic not specified".
+        """
         self.message = message
         super().__init__(self.message)
 
 
-"""
-    Class for a MQTT client.
-    Defines methods for start and stop the client, publishing and subscribing.
-    It also defines two event handlers (connection, message).
-"""
+class Client:
+    """
+    Class for an MQTT client.
 
-class Client():
+    This class defines methods for starting and stopping the client, publishing messages, and subscribing to topics.
+    It also defines two event handlers: on_connect and on_message.
 
-    def __init__(self, broker : str, topic : str = '') -> None:
+    Attributes:
+        broker (str): The MQTT broker's address to connect to.
+        topic (str): The topic to subscribe or publish to.
+        subscriptions (list): A list to store subscribed topics.
+        client (mqtt.Client): The MQTT client instance.
+    """
 
+    def __init__(self, broker: str, topic: str = ''):
         """
-            Constructor: initializes client configuration and utility attributes.
-        """
+        Constructor for Client class.
 
+        Args:
+            broker (str): The MQTT broker's address to connect to.
+            topic (str, optional): The topic to subscribe or publish to. Defaults to an empty string.
+        """
         # MQTT client configuration
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
@@ -69,54 +116,56 @@ class Client():
         self.topic = topic
         self.subscriptions = []
 
-
     def on_connect(self, client, userdata, flags, rc):
-
         """
-            Callback when client connects to the broker.
-        """        
+        Callback when the client connects to the broker.
 
+        Args:
+            client: The MQTT client instance.
+            userdata: User-defined data.
+            flags: Response flags from the broker.
+            rc (int): The connection result code.
+        """
         try:
             print("[MQTTX MODULE] Connection outcome: " + RETURN_CODES[rc])
 
             if rc == 0 and self.topic != '':
-                # Subscription to a topic after connection
                 client.subscribe(self.topic)
                 self.subscriptions.append(self.topic)
 
         except KeyError:
-            print("[MQTTX MODULE] Connection outcome: " + "FAILURE - unknown reason") 
-        
+            print("[MQTTX MODULE] Connection outcome: " + "FAILURE - unknown reason")
 
-    def on_message(client, userdata, msg):
-
+    def on_message(self, client, userdata, msg):
         """
-            Callback when a new message on a topic in which client is subscribed is received.
-        """
+        Callback when a new message on a subscribed topic is received.
 
+        Args:
+            client: The MQTT client instance.
+            userdata: User-defined data.
+            msg (mqtt.MQTTMessage): The received message.
+        """
         print("[MQTTX MODULE] TOPIC: " + msg.topic + " - PAYLOAD: " + str(msg.payload))
 
-
     def start(self):
-
         """
-            Starts connection to the broker.
+        Starts the connection to the MQTT broker.
         """
-
-        # MQTT broker connectioon
         self.client.connect(self.broker, 1883, 60)
-
-        # Starts MQTT connection manager loop
         self.client.loop_start()
 
-
-    def publish(self, message : str, topic : str = ''):
-
+    def publish(self, message: str, topic: str = ''):
         """
-            Publishes specified message on the specified topic.
-        """
+        Publishes a specified message on the specified topic.
 
-        # Publishes a message on a topic.
+        Args:
+            message (str): The message to be published.
+            topic (str, optional): The topic to publish the message to. Defaults to an empty string.
+
+        Raises:
+            MqttTopicNotSpecified: If neither the default topic nor a custom topic is specified.
+            MqttPublishError: If the message publish fails.
+        """
         if self.topic != '':
             message_id = self.client.publish(self.topic, message)
         elif topic != '':
@@ -124,33 +173,32 @@ class Client():
         else:
             raise MqttTopicNotSpecified
 
-        # Raise an error if message has no id (publish failed).
         if message_id is None:
             raise MqttPublishError
-        
-    def subscribe (self, topic : str):
 
+    def subscribe(self, topic: str):
         """
-            Subscription to a new topic.
+        Subscribes to a new topic.
+
+        Args:
+            topic (str): The topic to subscribe to.
+
+        Raises:
+            MqttSubscriptionError: If the subscription fails.
         """
-        
         self.client.subscribe(topic)
         self.subscriptions.append(topic)
 
     def stop(self):
-
         """
-            Connection shut down.
+        Stops the MQTT connection.
         """
-        
         self.client.loop_stop()
         self.client.disconnect()
 
 
-
-
 if __name__ == '__main__':
-
+    # Test main
     print("[MQTTX MODULE]: Test main.")
 
     BROKER = "broker.emqx.io"
@@ -164,7 +212,7 @@ if __name__ == '__main__':
         result = test.publish(MESSAGE)
         test.stop()
         print("[MQTTX MODULE]: Tested successfully.")
-    
+
     except MqttConnectionError:
         print("[MQTTX MODULE]: connection error.")
     except MqttSubscriptionError:
