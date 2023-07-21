@@ -69,6 +69,8 @@ class Sensor():
                f"size_per_field={self.size_per_field}, " \
                f"default_decimal_precision={self.default_decimal_precision}, unit='{self.unit}')"
 
+########## DIVIDERE I SENSORI PER CATEGORIE
+
 SENSORS = {
     0: Sensor('Carbon Monoxide - CO', '9229', 'SENSOR_GASES_CO', 0, 'CO', 1, 'float', 4, 3, 'ppm'),
     1: Sensor('Carbon Dioxide - CO2', '9230', 'SENSOR_GASES_CO2', 1, 'CO2', 1, 'float', 4, 3, 'ppm'),
@@ -91,6 +93,7 @@ SENSORS = {
     18: Sensor('Hydrogen Cyanide - HCN', '9383-P', 'SENSOR_GASES_PRO_HCN', 18, 'HCN', 1, 'float', 4, 3, 'ppm'),
     19: Sensor('Phosphine - PH3', '9384-P', 'SENSOR_GASES_PRO_PH3', 19, 'PH3', 1, 'float', 4, 3, 'ppm'),
     20: Sensor('Sulfur Dioxide - SO2', '9377-P', 'SENSOR_GASES_PRO_SO2', 20, 'SO2', 1, 'float', 4, 3, 'ppm'),
+    21: Sensor('Noise Level', 'TBD', 'SENSOR_CITIES_PRO_NOISE', 21, 'NOISE', 1, 'float', 4, 2, 'dBA'),
     30: Sensor('P&S! SOCKET A (gas sensor)', 'N/A', 'SENSOR_GASES_PRO_SOCKET_A', 30, 'GP_A', 1, 'float', 4, 3, 'ppm'),
     31: Sensor('P&S! SOCKET B (gas sensor)', 'N/A', 'SENSOR_GASES_PRO_SOCKET_B', 31, 'GP_B', 1, 'float', 4, 3, 'ppm'),
     32: Sensor('P&S! SOCKET C (gas sensor)', 'N/A', 'SENSOR_GASES_PRO_SOCKET_C', 32, 'GP_C', 1, 'float', 4, 3, 'ppm'),
@@ -122,7 +125,7 @@ SENSORS = {
     65: Sensor('String', 'N/A', 'SENSOR_STR', 65, 'STR', 1, 'string', 'variable', 'N/A', 'N/A'),
     68: Sensor('Unique Identifier', 'N/A', 'SENSOR_UID', 68, 'UID', 1, 'string', 'variable', 'N/A', 'N/A'),
     70: Sensor('Particle Matter - PM1', '9387-P', 'SENSOR_GASES_PRO_PM1', 70, 'PM1', 1, 'float', 4, 4, 'μg/m3'),
-    71: Sensor('Particle matter - PM2.5', '9387-P', 'SENSOR_GASES_PRO_PM2_5', 71, 'PM2_5', 1, 'float', 4, 4, 'μg/m3'),
+    71: Sensor('Particle Matter - PM2.5', '9387-P', 'SENSOR_GASES_PRO_PM2_5', 71, 'PM2_5', 1, 'float', 4, 4, 'μg/m3'),
     72: Sensor('Particle Matter - PM10', '9387-P', 'SENSOR_GASES_PRO_PM10', 72, 'PM10', 1, 'float', 4, 4, 'μg/m3'),
     74: Sensor('BME - Temperature Celsius', '9370-P', 'SENSOR_GASES_TC', 74, 'TC', 1, 'float', 4, 2, 'º C'),
     75: Sensor('BME - Temperature Farhenheit', '9370-P', 'SENSOR_GASES_TF', 75, 'TF', 1, 'float', 4, 2, 'º F'),
@@ -232,15 +235,15 @@ class Libellium():
         self.number_of_bytes = int(tokens[4], 2)
 
         # read serial id (8 bytes)
-        for i in range(5, 13):
-            self.serial_id += tokens[i]
+        for token in tokens[5:13]:
+            self.serial_id += token
 
         self.serial_id = int(self.serial_id, 2)
 
         # read Waspmote ID until '#' (variable from 0 to 16 bytes)
         self.waspmote_id = ''
-        index = 6
-        for token in tokens[6:]:
+        index = 13
+        for token in tokens[13:]:
             if token == '00100011':         # '00100011' = 0x23 = 35 = '#'
                 break
             else:
