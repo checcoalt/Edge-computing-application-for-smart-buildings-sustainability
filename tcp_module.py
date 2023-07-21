@@ -121,13 +121,12 @@ class TcpModule():
             expected tasks of this module for the received data.
         """
 
-        while True:
-            # Receive: writes the established number of bytes into the buffer
-            self.buffer = connection.recv(self.buffer_size).decode("utf-8")
+        # Receive: writes the established number of bytes into the buffer
+        self.buffer = connection.recv(self.buffer_size).decode("utf-8")
 
-            # Do stuffs
-            measurement = self.decode()
-            self.to_mqtt_broker(measurement)
+        # Do stuffs
+        measurement = self.decode()
+        self.to_mqtt_broker(measurement)
 
 
 if __name__ == '__main__':
