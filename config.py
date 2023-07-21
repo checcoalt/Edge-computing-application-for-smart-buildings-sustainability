@@ -9,4 +9,7 @@ BROKER = "broker.emqx.io"
 TOPIC_MEASUREMENTS  = "DTLab/measurements"
 
 # SET THE TOPIC WHERE COMMANDS FOR THE ACTUATORS WILL BE PUBLISHED
+
+BROKER = "broker.emqx.io"
+TOPIC_MEASUREMENTS  = "DTLab/measurements"
 TOPIC_COMMANDS = "DTLab/commands"
