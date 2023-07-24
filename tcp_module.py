@@ -66,7 +66,7 @@ class TcpModule:
     def decode(self):
         """
         Decodes the received frame into structured data using the 'libellium' module's utilities.
-        Returns a dictionary with collected measurements: {measure_type: measure_value}.
+        Returns a dictionary with collected measurements: {measure_type: {measure_value, measure_unit}}.
         """
         # Call to 'libellium' module utilities
         measurement = libellium.Libellium(self.buffer)
@@ -76,7 +76,13 @@ class TcpModule:
         # Create a dictionary of measures
         measurements = {}
         for measure in measurement.measurements:
-            measurements[measure[0].ascii_id] = f"{measure[1]} {measure[0].unit}"
+
+            json_data = {
+                "value": measure[1],
+                "unit": measure[0].unit
+            }
+            
+            measurements[measure[0].ascii_id] = json_data
 
         return measurements
 

@@ -1,5 +1,7 @@
 # ************************************** LIBELLIUM MODULE **************************************
 
+import struct
+
 class FrameType:
     """
     Defines a simple structure to identify the frame's type.
@@ -77,6 +79,7 @@ class FrameTypeNotExists(Exception):
         return f"Frame type with ID {self.frame_type_id} does not exist in the FRAME_TYPES dictionary."
 
 
+
 class Sensor:
     """
     Represents a sensor with its properties.
@@ -93,6 +96,7 @@ class Sensor:
         default_decimal_precision (int): Default decimal precision for floating-point fields.
         unit (str): Measurement unit of the sensor data.
     """
+
 
     def __init__(
         self,
@@ -133,7 +137,92 @@ class Sensor:
         self.default_decimal_precision = default_decimal_precision
         self.unit = unit
 
+
+
+    def string_convert(self, tokens : list) -> str:
+
+        """
+        Converts a list of binary tokens to a string.
+
+        Args:
+            tokens (list): The list of binary tokens.
+
+        Returns:
+            str: The converted string representation of the binary tokens.
+        """
+
+        measure = ''
+        for token in tokens:
+            measure += chr(int(token, 2))
+
+            if chr(int(token, 2)) == '\0':
+                break
+        return measure
+
+
+
+    def little_endian_conversion(self, byte_list : list, data_type : str):
+
+        """
+        Converts a little-endian byte list to its corresponding integer or floating-point value.
+
+        Args:
+            byte_list (list): The list of binary tokens representing the little-endian byte sequence.
+            data_type (str): The data type to be converted. Supported types: 'uint8_t', 'uint16_t', 'uint32_t', 'uint64_t', 'float'.
+
+        Returns:
+            Union[int, float]: The converted integer or floating-point value.
+        
+        Raises:
+            ValueError: If the data type is not supported (use 'uint8_t', 'uint16_t', 'uint32_t', 'uint64_t', or 'float').
+            ValueError: If the byte_list length does not match the expected size for the given data type.
+        """
+
+        if data_type == 'uint8_t':
+            return int("".join(byte_list), 2)
+
+        elif data_type == 'uint16_t':
+            if len(byte_list) != 2:
+                raise ValueError("La lista di byte per 'uint16_t' deve contenere esattamente 2 elementi.")
+            return int("".join(byte_list[::-1]), 2)
+
+        elif data_type == 'uint32_t':
+            if len(byte_list) != 4:
+                raise ValueError("La lista di byte per 'uint32_t' deve contenere esattamente 4 elementi.")
+            return int("".join(byte_list[::-1]), 2)
+
+        elif data_type == 'uint64_t':
+            if len(byte_list) != 8:
+                raise ValueError("La lista di byte per 'uint64_t' deve contenere esattamente 8 elementi.")
+            return int("".join(byte_list[::-1]), 2)
+
+        elif data_type == 'float':
+            if len(byte_list) != 4:
+                raise ValueError("La lista di byte per 'float' deve contenere esattamente 8 elementi.")
+            else:
+                binary_str = "".join(byte_list[::-1])
+
+                sign_bit = int(binary_str[0])
+                exponent_bits = binary_str[1:9]
+                fraction_bits = binary_str[9:]
+
+                sign = -1 if sign_bit else 1
+                exponent = int(exponent_bits,2) - 127
+
+                fraction = 1.0
+                for i, bit in enumerate(fraction_bits):
+                    fraction += int(bit) * 2 ** -(i + 1)
+
+                result = sign * fraction * 2 ** exponent
+                return result
+
+        else:
+            raise ValueError("Tipo di dato non supportato. Usare 'uint8_t', 'uint16_t', 'uint32_t', 'uint64_t' o 'float'.")
+            
+
+
     def string_measure(self, measure) -> str:
+
         """
         Returns a formatted string representation of the sensor's measurement.
 
@@ -257,6 +346,8 @@ SENSORS = {
 }
 
 
+
+
 class Libellium:
     """
     Represents a Libellium frame and provides methods for parsing it.
@@ -270,6 +361,7 @@ class Libellium:
         frame_sequence (int): The frame sequence number.
         measurements (list): A list of tuples containing (Sensor, measurement) pairs.
     """
+
 
     def __init__(self, frame: str):
         """
@@ -286,6 +378,33 @@ class Libellium:
         self.frame_sequence = 0
         self.measurements = []
 
+
+
+    def __str__(self) -> str:
+
+        """
+        String representation of decoded frame.
+        """
+
+        string = f"------------------------------------------------------------------------------------------------------------------------\
+        \nFrame:\
+        \n\t{self.type}\
+        \n\t<Number of bytes: {self.number_of_bytes}>\
+        \n\t<Serial ID: {self.serial_id}>\
+        \n\t<Waspmote ID: {self.waspmote_id}>\
+        \n\t<Frame sequence: {self.frame_sequence}>\
+        \n\n"
+
+        for measure in self.measurements:
+            s = measure[0]
+            m = measure[1]
+            string += f"\t<SENSOR>\t{s.string_measure(m)}\n"
+
+        string += "\n------------------------------------------------------------------------------------------------------------------------"
+        return string
+
+
+
     def hex_to_binary(self, hex_string: str) -> str:
         """
         Converts a hexadecimal string into a binary string.
@@ -300,6 +419,8 @@ class Libellium:
         binary_string = bin(integer_value)[2:]  # Remove the prefix "0b"
         return binary_string
 
+
+
     def binary_to_char(self, binary_string: str) -> str:
         """
         Converts a binary string into a character.
@@ -313,6 +434,8 @@ class Libellium:
         ascii_value = int(binary_string, 2)
         char = chr(ascii_value)
         return char
+
+
 
     def tokenize(self, hex_string: str) -> list:
         """
@@ -329,11 +452,18 @@ class Libellium:
             byte = self.hex_to_binary(hex_string[i:i + 2])
             tokens.append('0' * (8 - len(byte)) + byte)
         return tokens
+    
 
-    def parse(self):
+
+    def parse_header(self) -> int:
+
         """
-        Parses the Libellium frame and populates the class attributes accordingly.
+        Parses the Libellium frame header and populates the relevant attributes.
+
+        Returns:
+            int: The index of the first token in the payload after parsing the header.
         """
+
         tokens = self.tokenize(self.frame)
 
         starter = chr(int(tokens[0], 2)) + chr(int(tokens[1], 2)) + chr(int(tokens[2], 2))
@@ -370,30 +500,69 @@ class Libellium:
         self.frame_sequence = int(tokens[index], 2)
         index += 1
 
+        return index
+
+
+
+    def parse_payload(self, index : int):
+
+        """
+        Parses the Libellium frame payload and populates the measurements list.
+
+        Args:
+            index (int): The index of the first token in the payload.
+        """
+
+        tokens = self.tokenize(self.frame)
+
         end_of_frame = False
         while not end_of_frame:
             try:
                 sensor_id = int(tokens[index], 2)
                 index += 1
                 sensor = SENSORS[sensor_id]
-                measure = ''
 
-                try:
-                    for token in tokens[index:index + sensor.size_per_field]:
-                        measure += token
-                        index += 1
-                except IndexError:
-                    pass
+                # Read strings of variable length until '\0'
+                if sensor.fields_type == "string":
+                    measure = sensor.string_convert(tokens[index:])
+                    index += len(measure)
+                    self.measurements.append((sensor, measure))
 
-                measure = int(measure, 2)
-                self.measurements.append((sensor, measure))
+                else:
+                    measure = []
+
+                    try:
+                        for token in tokens[index:index + sensor.size_per_field]:
+                            measure.append(token)
+                            index += 1
+                    except IndexError:
+                        print("Unexpected error: sensor measurement's length mismatch.")
+
+                    # Little endian conversions
+                    measure_decoded = sensor.little_endian_conversion(measure, sensor.fields_type)
+
+                    self.measurements.append((sensor, measure_decoded))
+
             except SensorIdNotExists(sensor_id):
                 print("[LIBELLIUM] Sensor ID not valid.")
 
             try:
                 tokens[index]
-            except:
+            except IndexError:
                 end_of_frame = True
+
+
+
+    def parse(self):
+        """
+        Parses the Libellium frame and populates the class attributes accordingly.
+        It works by calling two distinct functions to decode header and then payload,
+        by resuming from the same index in the tokens' list.
+        """
+        
+        index_payload = self.parse_header()
+        self.parse_payload(index_payload)
+
 
 
 if __name__ == '__main__':

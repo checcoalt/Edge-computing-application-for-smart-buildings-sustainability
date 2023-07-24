@@ -16,7 +16,7 @@ SENSOR_NAME = "Libellium"
 SENSOR_MODEL = "?"
 
 # SET THE BROKER FOR MQTT SERVICES
-BROKER = "broker.emqx.io"
+BROKER = "broker.emqx.io" ############ LOCALE
 
 # SET THE TOPIC WHERE MEASUREMENTS WILL BE PUBLISHED
 TOPIC_MEASUREMENTS  = f"{ROOM}/measurements"
