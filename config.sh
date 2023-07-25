@@ -7,3 +7,4 @@
 
 # docker pull mongodb/mongodb-community-server
 # docker run --name mongo -d mongodb/mongodb-community-server:latest
+# docker exec -it mongo mongosh
