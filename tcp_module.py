@@ -2,8 +2,8 @@ from datetime import datetime
 import socket
 import threading
 import json
-import libellium
-import mqttx
+import libellium.libellium as libellium
+import mqttx.mqttx as mqttx
 import config
 
 
