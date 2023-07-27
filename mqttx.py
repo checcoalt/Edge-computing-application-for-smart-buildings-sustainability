@@ -195,29 +195,3 @@ class Client:
         """
         self.client.loop_stop()
         self.client.disconnect()
-
-
-if __name__ == '__main__':
-    # Test main
-    print("[MQTTX MODULE]: Test main.")
-
-    BROKER = "broker.emqx.io"
-    TOPIC = "DTLab/measurements"
-    MESSAGE = "Test message: " + str(randint(1, 10))
-
-    test = Client(BROKER, TOPIC)
-
-    try:
-        test.start()
-        result = test.publish(MESSAGE)
-        test.stop()
-        print("[MQTTX MODULE]: Tested successfully.")
-
-    except MqttConnectionError:
-        print("[MQTTX MODULE]: connection error.")
-    except MqttSubscriptionError:
-        print("[MQTTX MODULE]: subscription error.")
-    except MqttTopicNotSpecified:
-        print("[MQTTX MODULE]: topic not specified.")
-    except MqttPublishError:
-        print("[MQTTX MODULE]: publish error.")

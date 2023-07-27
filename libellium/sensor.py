@@ -1,5 +1,5 @@
 import json
-from sys import argv
+
 
 class Sensor:
     """
@@ -208,8 +208,7 @@ class UnexpectedTokenException(Exception):
 
 def read_sensors(file_path):
     with open(file_path, 'r') as file:
-        data = json.load(file)
-        sensors = data.get('sensors', [])
+        sensors = json.load(file)
 
         sensor_dict = {}
         for sensor_data in sensors:
@@ -217,28 +216,6 @@ def read_sensors(file_path):
             sensor = Sensor(**sensor_data)
             sensor_dict[binary_id] = sensor
 
-            print(sensor + " read.")
+            print(str(sensor) + " read.")
 
         return sensor_dict
-    
-SENSORS = {}
-
-if __name__ == "__main__":
-    # Get sensor file loading mode from CLI
-    try:
-        mode = argv[1]
-        sensor_dict = {}
-
-        if mode == "latest":
-            # Bind a URL from where latest sensor.json will be downloaded
-            print("Available in future")
-
-        elif mode == "local":
-            # Leggi i dati dei sensori dal file JSON e popola il dizionario di oggetti
-            SENSORS = read_sensors("sensor.json")
-
-        else:
-            raise ValueError
-        
-    except IndexError | ValueError:
-        print("Usage: python -m sensor [local | latest]")

@@ -1,0 +1,61 @@
+[
+    {
+        "metadata": {
+            "date": "2023-07-27",
+            "time": "18:04:57.3",
+            "descriptor": "Sustainability",
+            "sensor name": "Libellium",
+            "sensor model": "?",
+            "room": "DTLab",
+            "protocol": "MQTT",
+            "broker": "127.0.0.1",
+            "topic": "DTLab/measurements"
+        },
+        "data": {
+            "BAT": {
+                "value": 100,
+                "unit": "%"
+            },
+            "NOISE": {
+                "value": 5.877471754111438e-39,
+                "unit": "dBA"
+            },
+            "CO": {
+                "value": 1.8400079011917114,
+                "unit": "ppm"
+            },
+            "CO2": {
+                "value": 5.877471754111438e-39,
+                "unit": "ppm"
+            },
+            "O3": {
+                "value": 0.28412917256355286,
+                "unit": "ppm"
+            },
+            "TC": {
+                "value": 24.510000228881836,
+                "unit": "\u00c2\u00baC"
+            },
+            "HUM": {
+                "value": 56.58203125,
+                "unit": "%RH"
+            },
+            "PRES": {
+                "value": 101793.4921875,
+                "unit": "Pascales"
+            },
+            "PM1": {
+                "value": 5.877471754111438e-39,
+                "unit": "\u00ce\u00bcg/m3"
+            },
+            "PM2_5": {
+                "value": 5.877471754111438e-39,
+                "unit": "\u00ce\u00bcg/m3"
+            },
+            "PM10": {
+                "value": 5.877471754111438e-39,
+                "unit": "\u00ce\u00bcg/m3"
+            }
+        }
+    }
+]

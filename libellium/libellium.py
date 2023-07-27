@@ -1,7 +1,11 @@
 # ************************************** LIBELLIUM MODULE **************************************
 
-import sensor
-import frametype as ft
+import libellium.sensor as sensor
+import libellium.frametype as ft
+
+
+SENSORS = sensor.read_sensors("libellium/sensor.json")
+
 
 class Libellium:
     """
@@ -175,28 +179,28 @@ class Libellium:
             try:
                 sensor_id = int(tokens[index], 2)
                 index += 1
-                sensor = sensor.sensor.SENSORS[sensor_id]
+                sensor_obj = SENSORS[sensor_id]
 
                 # Read strings of variable length until '\0'
-                if sensor.fields_type == "string":
-                    measure = sensor.string_convert(tokens[index:])
+                if sensor_obj.fields_type == "string":
+                    measure = sensor_obj.string_convert(tokens[index:])
                     index += len(measure)
-                    self.measurements.append((sensor, measure))
+                    self.measurements.append((sensor_obj, measure))
 
                 else:
                     measure = []
 
                     try:
-                        for token in tokens[index:index + sensor.size_per_field]:
+                        for token in tokens[index:index + sensor_obj.size_per_field]:
                             measure.append(token)
                             index += 1
                     except IndexError:
                         print("Unexpected error: sensor measurement's length mismatch.")
 
                     # Little endian conversions
-                    measure_decoded = sensor.little_endian_conversion(measure, sensor.fields_type)
+                    measure_decoded = sensor_obj.little_endian_conversion(measure, sensor_obj.fields_type)
 
-                    self.measurements.append((sensor, measure_decoded))
+                    self.measurements.append((sensor_obj, measure_decoded))
 
             except sensor.SensorIdNotExists(sensor_id):
                 print("[LIBELLIUM] Sensor ID not valid.")

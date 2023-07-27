@@ -1,6 +1,5 @@
 import json
-from .. import mqttx as mqttx
-import config
+import mqttx, config
 
 class LoggerClient(mqttx.Client):
     """
