@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from json import loads
-import mqttx as mqttx
+import mqttx.mqttx as mqttx
 import config
 
 class DatabaseClient(mqttx.Client):
