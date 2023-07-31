@@ -1,21 +1,17 @@
 # Choose a base image that includes Python and Docker
 FROM ubuntu:latest
 
+# Create a working directory "home"
 WORKDIR /home/
+
 # Download the EMQX image
 RUN apt-get update
-
 RUN apt-get install -y curl 
 RUN curl -s https://assets.emqx.com/scripts/install-emqx-deb.sh | bash
 RUN apt-get install emqx 
 
-RUN apt-get install -y python3 pip
-
-
-
-
 # Install python3
-#
+RUN apt-get install -y python3 pip
 RUN python3 -m pip install --upgrade pip
 
 # Install Paho MQTT client library in order to publish messages from within containers
