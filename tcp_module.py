@@ -95,7 +95,7 @@ class TcpModule:
         """
         try:
             # Starts an MQTTX client
-            publisher = mqttx.Client(config.BROKER, config.TOPIC_MEASUREMENTS)
+            publisher = mqttx.Client(config.BROKER_IP_ADDRESS, config.TOPIC_MEASUREMENTS)
             publisher.start()
 
             # dict to JSON
@@ -103,12 +103,8 @@ class TcpModule:
                 "metadata": {
                     "date": datetime.today().strftime('%Y-%m-%d'),
                     "time": datetime.now().strftime('%H:%M:%S.%f')[:-5],
-                    "descriptor": config.DESCRIPTOR,
-                    "sensor name": config.SENSOR_NAME,
-                    "sensor model": config.SENSOR_MODEL,
                     "room": config.ROOM,
-                    "protocol": config.PROTOCOL,
-                    "broker": config.BROKER,
+                    "broker": config.BROKER_IP_ADDRESS + ":" + config.BROKER_PORT_NUMBER,
                     "topic": config.TOPIC_MEASUREMENTS
                 },
                 "data": measures
@@ -151,5 +147,5 @@ class TcpModule:
 if __name__ == '__main__':
     print("[TCP MODULE]: Test main.")
 
-    test = TcpModule('localhost', 8000, 1024)
+    test = TcpModule(config.IP_ADDRESS, int(config.PORT_NUMBER), int(config.BUFFER_SIZE))
     test.start()

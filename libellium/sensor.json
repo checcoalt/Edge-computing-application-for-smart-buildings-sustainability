@@ -561,7 +561,7 @@
         "fields_type": "float",
         "size_per_field": 4,
         "default_decimal_precision": 2,
-        "unit": "ºC"
+        "unit": "C"
     },
     {
         "name": "Accelerometer",
@@ -621,7 +621,7 @@
         "fields_type": "float",
         "size_per_field": 4,
         "default_decimal_precision": 4,
-        "unit": "μg/m3"
+        "unit": "ug/m3"
     },
     {
         "name": "Particle Matter - PM2.5",
@@ -633,7 +633,7 @@
         "fields_type": "float",
         "size_per_field": 4,
         "default_decimal_precision": 4,
-        "unit": "μg/m3"
+        "unit": "ug/m3"
     },
     {
         "name": "Particle Matter - PM10",
@@ -645,7 +645,7 @@
         "fields_type": "float",
         "size_per_field": 4,
         "default_decimal_precision": 4,
-        "unit": "μg/m3"
+        "unit": "ug/m3"
     },
     {
         "name": "BME - Temperature Celsius",
@@ -657,7 +657,7 @@
         "fields_type": "float",
         "size_per_field": 4,
         "default_decimal_precision": 2,
-        "unit": "ºC"
+        "unit": "C"
     },
     {
         "name": "BME - Temperature Farhenheit",
@@ -669,7 +669,7 @@
         "fields_type": "float",
         "size_per_field": 4,
         "default_decimal_precision": 2,
-        "unit": "ºF"
+        "unit": "F"
     },
     {
         "name": "BME - Humidity",
