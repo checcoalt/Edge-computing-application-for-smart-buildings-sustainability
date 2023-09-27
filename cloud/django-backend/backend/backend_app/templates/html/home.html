@@ -1,0 +1,73 @@
+{% load static %}
+<html>
+    <head>
+        <title></title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+    </head>
+    <body>
+        <aside class="menu">
+            <a class="menu-item-active" href="/home">
+                <img class="menu-item-img" src="{% static 'img/home.svg' %}"/>
+                <span class="menu-item-label">Home</span>
+            </a>
+            <a class="menu-item" href="/temperature">
+                <img class="menu-item-img" src="{% static 'img/termometer.svg' %}"/>
+                <span class="menu-item-label">Temperature</span>
+            </a>
+            <a class="menu-item" href="/humidity">
+                <img class="menu-item-img" src="{% static 'img/drop.svg' %}"/>
+                <span class="menu-item-label">Humidity</span>
+            </a>
+            <a class="menu-item" href="/co2">
+                <img class="menu-item-img" src="{% static 'img/co2.svg' %}"/>
+                <span class="menu-item-label">Carbon dioxide</span>
+            </a>
+            <a class="menu-item" href="/energy">
+                <img class="menu-item-img" src="{% static 'img/energy.svg' %}"/>
+                <span class="menu-item-label">Energy consumption</span>
+            </a>
+        </aside>
+        <section class="home-content">
+            <h1>Welcome back!</h1>
+            <h2>How it's going outside ...</h2>
+            <article class="home-content-outside">
+                <div class="home-content-outside-item">
+                    <img src="{% static 'img/weather.svg' %}">
+                    <p>Sunny</p>
+                </div>
+                <div class="home-content-outside-item">
+                    <img src="{% static 'img/termometer.svg' %}">
+                    <p>23°</p>
+                </div>
+                <div class="home-content-outside-item">
+                    <img src="{% static 'img/drop.svg' %}">
+                    <p>55%</p>
+                </div>
+                <div class="home-content-outside-item">
+                    <img src="{% static 'img/wind.svg' %}">
+                    <p>10 km/h</p>
+                </div>
+            </article>
+            <h2>... and what's happening inside</h2>
+            <article class="home-content-inside">
+                <div class="home-content-inside-item">
+                    <img src="{% static 'img/termometer.svg' %}">
+                    <p>24°</p>
+                </div>
+                <div class="home-content-inside-item">
+                    <img src="{% static 'img/drop.svg' %}">
+                    <p>20%</p>
+                </div>
+                <div class="home-content-inside-item">
+                    <img src="{% static 'img/co2.svg' %}">
+                    <p>10 ppm</p>
+                </div>
+            </article>
+        </section>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>        
+        <script src="{% static 'js/index.js' %}"></script>
+    </body>
+</html>
