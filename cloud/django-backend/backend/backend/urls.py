@@ -22,6 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', home_view, name='home'),
 
+    path('display_json/', display_json, name='display_json'),
+
     path('temperature/', temperature_view, name='temperature'),
     path('temperature/day/', temperature_view_day, name='temperature_day'),
     path('temperature/month/', temperature_view_month, name='temperature_month'),

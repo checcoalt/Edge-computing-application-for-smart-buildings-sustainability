@@ -1,62 +1,3 @@
-
-var getMetadata = {
-    type: 'line',
-    mainLabel: "Temperature (°C)"
-}
-
-var getData = [
-    { time: '00:00', value: 20 },
-    { time: '00:30', value: 19.5 },
-    { time: '01:00', value: 19 },
-    { time: '01:30', value: 18.5 },
-    { time: '02:00', value: 18 },
-    { time: '02:30', value: 17.5 },
-    { time: '03:00', value: 17 },
-    { time: '03:30', value: 17.5 },
-    { time: '04:00', value: 18 },
-    { time: '04:30', value: 18.5 },
-    { time: '05:00', value: 19 },
-    { time: '05:30', value: 19.5 },
-    { time: '06:00', value: 20 },
-    { time: '06:30', value: 21 },
-    { time: '07:00', value: 22 },
-    { time: '07:30', value: 23 },
-    { time: '08:00', value: 24 },
-    { time: '08:30', value: 25 },
-    { time: '09:00', value: 26 },
-    { time: '09:30', value: 27 },
-    { time: '10:00', value: 28 },
-    { time: '10:30', value: 29 },
-    { time: '11:00', value: 30 },
-    { time: '11:30', value: 30.5 },
-    { time: '12:00', value: 31 },
-    { time: '12:30', value: 31.5 },
-    { time: '13:00', value: 32 },
-    { time: '13:30', value: 32.5 },
-    { time: '14:00', value: 32 },
-    { time: '14:30', value: 31.5 },
-    { time: '15:00', value: 31 },
-    { time: '15:30', value: 30.5 },
-    { time: '16:00', value: 30 },
-    { time: '16:30', value: 29.5 },
-    { time: '17:00', value: 29 },
-    { time: '17:30', value: 28.5 },
-    { time: '18:00', value: 28 },
-    { time: '18:30', value: 27.5 },
-    { time: '19:00', value: 27 },
-    { time: '19:30', value: 26.5 },
-    { time: '20:00', value: 26 },
-    { time: '20:30', value: 25.5 },
-    { time: '21:00', value: 25 },
-    { time: '21:30', value: 24.5 },
-    { time: '22:00', value: 24 },
-    { time: '22:30', value: 23.5 },
-    { time: '23:00', value: 23 },
-    { time: '23:30', value: 22.5 }
-];
-
-// Estrai le etichette (orari) e i valori delle temperature dai dati
-
 var configurator = (getMetadata, getData) => {
 
     var labels = getData.map(function(data) {
@@ -71,14 +12,14 @@ var configurator = (getMetadata, getData) => {
     var config = {
         type: getMetadata.type,
         data: {
-        labels: labels,
-        datasets: [{
-            label: getMetadata.mainLabel,
-            data: values,
-            fill: false,
-            borderColor: '#2364AA',
-            borderWidth: 2
-        }]
+            labels: labels,
+            datasets: [{
+                label: getMetadata.mainLabel,
+                data: values,
+                fill: false,
+                borderColor: '#2364AA',
+                borderWidth: 2
+            }]
         },
         options: {
             scales: {
@@ -122,45 +63,78 @@ var configurator = (getMetadata, getData) => {
 var createChart = (config) => {
     var ctx = document.getElementById('chart').getContext('2d');
     var myChart = new Chart(ctx, config);
+    return myChart;
 }
 
 
 var main = () => {
-    var first_loading = true;
+
     "use strict";
 
+    var myChart;                // riferimento al grafico creato da "createChart()"
+    var firstLoading = true;    // flag per stabilire se il grafico va creato da zero o aggiornato
+    var whichButton;            // variabile per stabilire quale richiesta inoltrare al server
+    
+    // riferimenti a metadati e dati ottenuti via http request
+    var getMetadata;
+    var getData;
+
+    // riferimenti ai button per la scelta del periodo di tempo
     var $timechosers = $(".period-choser-item");
 
+    // event listener: click
     $timechosers.on("click", function() {
+
+        // Manipolazione delle classi CSS per effetti grafici frontend
         $timechosers.addClass("period-choser-item");
         $timechosers.removeClass("period-choser-item-active");
         $(this).removeClass("period-choser-item");
         $(this).addClass("period-choser-item-active");
 
+        whichButton = $(this).data("value");
+
+        // GET request
         $.ajax({
-            url: "/temperature/day/",
             method: "GET",
             dataType: "json",
-            success: function(data) {
-                console.log(data);
-                /*
-                if (first_loading === false){
-                    const newDataset = [5, 15, 25, 35, 45];
-                    chart.data.datasets[0].data = newDataset;
-                    chart.update(); // Aggiorna il grafico
-                }
-                */
-                //destroy
+            url: whichButton,
+            success: (response) => {
+                response = JSON.parse(response);
+                getMetadata = response.metadata;
+                getData = response.data;
 
-            },
+                //sort
+                getData.sort(function(a, b) {
+                    return new Date(a.time) - new Date(b.time);
+                });
+
+                console.log(getData)
+
+                // Se è la prima richiesta, crea il grafico
+                if (firstLoading === true) {
+                    let config = configurator(getMetadata, getData);
+                    myChart = createChart(config);
+                    firstLoading = false;
+                }
+
+                // altrimenti aggiorna quello esistente con i nuovi dati
+                else {
+                    myChart.data.labels = getData.map(function(data) {
+                        return data.time;
+                    });
+                    myChart.data.datasets[0].data = getData.map(function(data) {
+                        return data.value;
+                    });
+                    myChart.update(); // Aggiorna il grafico
+                }
+            }
         });
-        // ritorna getMetadata, getData
-        let config = configurator(getMetadata, getData);
-        createChart(config);
+
+        
+
     });
 
-    //let config = configurator([], []);
-    //createChart(config);
+    // Trigger automatico per il primo click al momento del caricamento
     $timechosers.eq(0).trigger("click");
 };
 
