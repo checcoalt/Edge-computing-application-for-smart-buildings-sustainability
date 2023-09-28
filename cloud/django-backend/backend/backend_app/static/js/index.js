@@ -126,7 +126,7 @@ var createChart = (config) => {
 
 
 var main = () => {
-
+    var first_loading = true;
     "use strict";
 
     var $timechosers = $(".period-choser-item");
@@ -137,12 +137,30 @@ var main = () => {
         $(this).removeClass("period-choser-item");
         $(this).addClass("period-choser-item-active");
 
-        // $.ajax();
+        $.ajax({
+            url: "/temperature/day/",
+            method: "GET",
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+                /*
+                if (first_loading === false){
+                    const newDataset = [5, 15, 25, 35, 45];
+                    chart.data.datasets[0].data = newDataset;
+                    chart.update(); // Aggiorna il grafico
+                }
+                */
+                //destroy
+
+            },
+        });
         // ritorna getMetadata, getData
         let config = configurator(getMetadata, getData);
         createChart(config);
     });
 
+    //let config = configurator([], []);
+    //createChart(config);
     $timechosers.eq(0).trigger("click");
 };
 

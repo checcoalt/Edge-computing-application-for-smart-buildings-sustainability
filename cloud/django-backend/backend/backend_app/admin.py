@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import JSONData, Libellium
+from .models import Libellium
 
 # Register your models here.
 

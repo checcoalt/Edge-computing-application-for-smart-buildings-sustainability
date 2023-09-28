@@ -2,9 +2,6 @@ from django.db import models
 
 # Create your models here.
 
-class JSONData(models.Model):
-    data = models.JSONField()
-
 class Libellium(models.Model):
     timestamp = models.DateTimeField()
     # id = models.IntegerField(primary_key=True)
