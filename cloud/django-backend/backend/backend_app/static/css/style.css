@@ -1,0 +1,197 @@
+html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+
+    background-color: #F7F0F5;
+}
+
+.menu { 
+    background: rgb(61,165,217);
+    background: linear-gradient(90deg, rgba(61,165,217,1) 0%, rgba(35,100,170,1) 100%);
+    width: 20%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+
+    padding: 50px;
+}
+
+.menu-item {
+    width: min(100%, 300px);
+    text-decoration: none;
+
+    border-radius: 40px;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.menu-item:hover {
+    background-color: rgba(115, 191, 184, 0.4);
+}
+
+.menu-item:active {
+    background-color: rgba(115, 191, 184, 1);
+    border: 1px solid #F7F0F5;
+}
+
+.menu-item-active {
+    width: min(100%, 300px);
+    text-decoration: none;
+    border-radius: 40px;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    background-color: rgba(115, 191, 184, 1);
+}
+
+.menu-item-img {
+    height: 60px;
+}
+
+.menu-item-label {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: large;
+    color: #F7F0F5;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    width: 80%;
+    gap: 20px;
+}
+
+h1 {
+    color: #110B11;
+    font-size: 34px;
+    padding-left: 50px;
+    align-self: flex-start;
+}
+
+.period-choser {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding-left: 100px;
+}
+
+.period-choser-item {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 20px;
+    color: #110B11;
+    background-color: transparent;
+    text-align: center;
+
+    border: 1px solid #110B11;
+    width: 120px;
+
+    border-radius: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    cursor: pointer;
+}
+
+.period-choser-item-active {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 20px;
+    background-color: #73BFB8;
+    color: #F7F0F5;
+    border: 1px solid #F7F0F5;
+    text-align: center;
+
+    width: 120px;
+
+    border-radius: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    cursor: pointer;
+}
+
+.period-choser-item:hover {
+    background-color: #3DA5D9;
+    color: #110B11;
+    border: 1px solid #110B11;
+}
+
+.period-choser-item:active {
+    background-color: #73BFB8;
+    color: #110B11;
+}
+
+.period-choser-item-active svg path {
+    stroke: #F7F0F5;
+}
+
+.period-choser-item:hover svg path {
+    stroke: #110B11;
+}
+
+.period-choser-item-icon {
+    width: 30px;
+}
+
+.period-choser-item-icon path {
+    fill: transparent;
+    stroke: #110B11;
+    stroke-width: 2;
+}
+
+.graph-container {
+    padding-top: 20px;
+}

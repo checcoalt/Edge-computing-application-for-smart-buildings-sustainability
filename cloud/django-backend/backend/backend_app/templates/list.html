@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>List of JSON Data</title>
+</head>
+<body>
+
+<h1>List of JSON Data</h1>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>JSON Data</th>
+    </tr>
+    {% for json_data in json_data_list %}
+        <tr>
+            <td>{{ json_data.id }}</td>
+            <td>
+                <pre>{{ json_data.timestamp }}</pre>
+                <pre>{{ json_data.CO }}</pre>
+                <pre>{{ json_data.O3 }}</pre>
+                <pre>{{ json_data.TC }}</pre>
+                <pre>{{ json_data.HUM }}</pre>
+                <pre>{{ json_data.PRES }}</pre>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
