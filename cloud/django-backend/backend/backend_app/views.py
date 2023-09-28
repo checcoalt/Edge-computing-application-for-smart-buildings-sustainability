@@ -46,7 +46,38 @@ def home_view(request):
     return render(request, 'html/home.html')
 
 def temperature_view(request):
-    return render(request, 'html/temperature.html')
+    measurements = Libellium.objects.all()
+    
+    # Create metadata dictionary
+    metadata = {
+        "type": "line",
+        "mainLabel": "Temperature (°C)"
+    }
+
+    # Create data list
+    data = []
+    # Iterate through Libellium instances
+    for instance in measurements:
+        time = instance.timestamp.strftime("%H:%M")  # Format timestamp as hh:mm
+        value = instance.TC  # Assuming TC is temperature in °C
+
+        # Create data point dictionary
+        data_point = {"time": time, "value": value}
+
+        # Add data point to data list
+        data.append(data_point)
+
+    result = {
+    "metadata": metadata,
+    "data": data
+    }
+
+    # Convert the dictionary to a JSON string
+    result_json = json.dumps(result)
+
+    print(result_json)
+
+    return render(request, 'html/temperature.html', {'result_json': result_json})
 
 def humidity_view(request):
     return render(request, 'html/humidity.html')
