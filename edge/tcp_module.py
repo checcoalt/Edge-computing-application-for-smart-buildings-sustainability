@@ -4,7 +4,8 @@ import threading
 import json
 import libellium.libellium as libellium
 import mqttx.mqttx as mqttx
-import edge.config as config
+import config as config
+import requests
 
 
 class TcpModule:
@@ -95,8 +96,8 @@ class TcpModule:
         """
         try:
             # Starts an MQTTX client
-            publisher = mqttx.Client(config.BROKER_IP_ADDRESS, config.TOPIC_MEASUREMENTS)
-            publisher.start()
+            #publisher = mqttx.Client(config.BROKER_IP_ADDRESS, config.TOPIC_MEASUREMENTS)
+            #publisher.start()
 
             # dict to JSON
             json_string = {
@@ -111,6 +112,24 @@ class TcpModule:
             }
 
             json_string = json.dumps(json_string)
+
+            # Definire l'URL di destinazione
+            url = "http://127.0.0.1:8000/display_json"  # Sostituisci con l'URL effettivo
+
+            # Impostare le intestazioni HTTP (opzionale)
+            headers = {
+                "Content-Type": "application/json",
+            }
+            print(json_string)
+            # Effettuare la richiesta HTTP POST con i dati JSON nel corpo
+            response = requests.post(url, data=json_string, headers=headers)
+
+            # Verificare la risposta
+            if response.status_code == 200:
+                print("Richiesta inviata con successo.")
+            else:
+                print("Errore nella richiesta:", response.status_code)
+                print(response.text)  # Puoi stampare la risposta per ottenere ulteriori dettagli sull'errore, se presente
 
             # Publish on the given topic
             publisher.publish(json_string)
