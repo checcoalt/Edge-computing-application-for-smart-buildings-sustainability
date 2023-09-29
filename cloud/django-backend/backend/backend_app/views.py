@@ -90,23 +90,17 @@ def co2_view_day(request):
     
     result_json = build_json_day("CO2 (ppm)", "CO")
 
-
-
     return JsonResponse(result_json, safe=False)
 
 def co2_view_month(request):
     
     result_json = build_json_month("CO2 (ppm)", "CO")
 
-
-
     return JsonResponse(result_json, safe=False)
 
 def co2_view_year(request):
     
     result_json = build_json_year("CO2 (ppm)", "CO")
-
-
 
     return JsonResponse(result_json, safe=False)
 
@@ -116,22 +110,16 @@ def energy_view(request):
 
 
 def build_json_day(label, parameter):
-    measurements = Libellium.objects.all()
-
-    for instance in measurements:
-        print(instance.timestamp)
     # Assuming timestamp is your datetime field
-    current_date = timezone.now().date()
-    print(current_date)
+    current_datetime = timezone.now()
 
-    # Get the start of the current day
-    start_datetime = datetime.datetime.combine(current_date, datetime.time.min, tzinfo=timezone.utc)
-    print(start_datetime)
+    # Calculate the start of the 24-hour slot
+    start_datetime = current_datetime - datetime.timedelta(hours=24)
 
-    # Get the end of the current day
-    end_datetime = datetime.datetime.combine(current_date, datetime.time.max, tzinfo=timezone.utc)
+
+    # Calculate the end of the 24-hour slot
+    end_datetime = current_datetime
     print(end_datetime)
-
     measurements = Libellium.objects.filter(timestamp__range=(start_datetime, end_datetime))
 
     # Create metadata dictionary
@@ -166,21 +154,16 @@ def build_json_day(label, parameter):
     return result_json
 
 def build_json_month(label, parameter):
-    # Assuming timestamp is your datetime field
-    current_year = timezone.now().year
-    current_month = timezone.now().month
+   # Assuming timestamp is your datetime field
+    current_datetime = timezone.now()
 
-    # Get the first day of the current month
-    start_date = datetime.datetime(year=current_year, month=current_month, day=1, tzinfo=timezone.utc)
-
-    # Get the last day of the current month
-    if current_month == 12:
-        end_date = datetime.datetime(year=current_year + 1, month=1, day=1, tzinfo=timezone.utc) - datetime.timedelta(seconds=1)
-    else:
-        end_date = datetime.datetime(year=current_year, month=current_month + 1, day=1, tzinfo=timezone.utc) - datetime.timedelta(seconds=1)
-
-    measurements = Libellium.objects.filter(timestamp__range=(start_date, end_date))
-    
+    # Calculate the end of the 30-day slot (which is the current date's end of day)
+    end_datetime = datetime.datetime.combine(current_datetime, datetime.datetime.max.time())  # This is equivalent to datetime.datetime.combine(current_date, datetime.time.max)
+    print(end_datetime)
+    # Calculate the start of the 30-day slot
+    start_datetime = end_datetime - datetime.timedelta(days=30)
+    print(start_datetime)
+    measurements = Libellium.objects.filter(timestamp__range=(start_datetime, end_datetime))
     # Create metadata dictionary
     metadata = {
         "type": "line",
@@ -214,12 +197,20 @@ def build_json_month(label, parameter):
 
 def build_json_year(label, parameter):
     # Assuming timestamp is your datetime field
-    current_year = timezone.now().year
-    start_date = datetime.datetime(year=current_year, month=1, day=1, tzinfo=timezone.utc)
-    end_date = datetime.datetime(year=current_year, month=12, day=31, hour=23, minute=59, second=59, tzinfo=timezone.utc)
+    current_datetime = timezone.now()
 
-    measurements = Libellium.objects.filter(timestamp__range=(start_date, end_date))
-        # Create metadata dictionary
+    # Calculate the end of the 1-year slot (which is the current date's end of day)
+    end_datetime = datetime.datetime.combine(current_datetime, datetime.datetime.max.time())
+
+    # Calculate the start of the 1-year slot
+    start_datetime = end_datetime - datetime.timedelta(days=365)
+
+    measurements = Libellium.objects.filter(timestamp__range=(start_datetime, end_datetime))
+
+    print(start_datetime)
+    print(end_datetime)
+
+    # Create metadata dictionary
     metadata = {
         "type": "line",
         "mainLabel": label
