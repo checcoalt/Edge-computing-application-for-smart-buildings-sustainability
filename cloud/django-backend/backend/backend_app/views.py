@@ -116,10 +116,9 @@ def build_json_day(label, parameter):
     # Calculate the start of the 24-hour slot
     start_datetime = current_datetime - datetime.timedelta(hours=24)
 
-
     # Calculate the end of the 24-hour slot
     end_datetime = current_datetime
-    print(end_datetime)
+
     measurements = Libellium.objects.filter(timestamp__range=(start_datetime, end_datetime))
 
     # Create metadata dictionary
@@ -159,11 +158,12 @@ def build_json_month(label, parameter):
 
     # Calculate the end of the 30-day slot (which is the current date's end of day)
     end_datetime = datetime.datetime.combine(current_datetime, datetime.datetime.max.time())  # This is equivalent to datetime.datetime.combine(current_date, datetime.time.max)
-    print(end_datetime)
+
     # Calculate the start of the 30-day slot
     start_datetime = end_datetime - datetime.timedelta(days=30)
-    print(start_datetime)
+
     measurements = Libellium.objects.filter(timestamp__range=(start_datetime, end_datetime))
+
     # Create metadata dictionary
     metadata = {
         "type": "line",
@@ -206,9 +206,6 @@ def build_json_year(label, parameter):
     start_datetime = end_datetime - datetime.timedelta(days=365)
 
     measurements = Libellium.objects.filter(timestamp__range=(start_datetime, end_datetime))
-
-    print(start_datetime)
-    print(end_datetime)
 
     # Create metadata dictionary
     metadata = {
